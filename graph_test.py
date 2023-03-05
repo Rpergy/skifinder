@@ -20,4 +20,19 @@ available_nodes = []
 for i in range(len(adjacency_matrix)):
     if not adjacency_matrix[i][node] == 0:
         available_nodes.append(vertex_list[i])
-print(f"Available Nodes from {vertex_list[4]}: {available_nodes}")
+print(f"Available Nodes from {vertex_list[4]}: {available_nodes}\n")
+
+# shortest distance
+current_node = 0
+shortest_distance = 100000
+shortest_distance_node = 0
+
+for selectedNode in range(len(adjacency_matrix)):
+    dst = adjacency_matrix[selectedNode][current_node]
+
+    if not dst == 0:
+        if dst < shortest_distance:
+            shortest_distance = dst
+            shortest_distance_node = selectedNode
+
+print(f"Shortest distance node from {vertex_list[current_node]}: {vertex_list[shortest_distance_node]}")
