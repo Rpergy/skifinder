@@ -40,6 +40,5 @@ while not len(Q) == 0: # while Q is not empty
     for v in neighbors: # if any new shortest path is discovered, that path is selected
         if dist[v] > dist[shortest_node] + adjacency_matrix[v][shortest_node]:
             dist[v] = dist[shortest_node] + adjacency_matrix[v][shortest_node]
-    
 
 print(dist)
