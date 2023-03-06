@@ -1,6 +1,6 @@
 import numpy as np
 
-infinite = 100000000000
+infinity = 100000000000
 
 vertex_list = ["A", "B", "C", "D", "E", "F"]
 
@@ -17,28 +17,30 @@ endingNode = 4
 Q = [0, 1, 2, 3, 4, 5]
 S = []
 
-dist = [infinite, 0, infinite, infinite, infinite, infinite]
+dist = [infinity, 0, infinity, infinity, infinity, infinity]
 
 while not len(Q) == 0: # while Q is not empty
-    shortest_distance = infinite
-    shortest_node = 0
+    shortest_distance = infinity
+    current_node = 0
 
     for i in Q: # find shortest distance away node
         if dist[i] < shortest_distance:
             shortest_distance = dist[i]
-            shortest_node = i
+            current_node = i
 
-    S.append(shortest_node) # add node to traversed nodes
-    Q.remove(shortest_node) # remove node from leftover nodes
+    S.append(current_node) # add node to traversed nodes
+    Q.remove(current_node) # remove node from leftover nodes
 
-    neighbors = [] 
+    neighbors = []
     for i in range(len(adjacency_matrix)): # calculate all neighbors of current node
-        dst = adjacency_matrix[i][shortest_node]
+        dst = adjacency_matrix[i][current_node]
         if not dst == 0:
             neighbors.append(i)
+
+    print(f"Neighbors of {vertex_list[current_node]}: {neighbors}")
     
     for v in neighbors: # if any new shortest path is discovered, that path is selected
-        if dist[v] > dist[shortest_node] + adjacency_matrix[v][shortest_node]:
-            dist[v] = dist[shortest_node] + adjacency_matrix[v][shortest_node]
+        if dist[v] > dist[current_node] + adjacency_matrix[v][current_node]: 
+            dist[v] = dist[current_node] + adjacency_matrix[v][current_node]
 
 print(dist)
