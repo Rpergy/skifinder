@@ -1,4 +1,5 @@
 import numpy as np
+import dijkstras
 
 vertex_list = np.array(["A", "B", "C", "D", "E", "F"])
 
@@ -36,3 +37,15 @@ for selectedNode in range(len(adjacency_matrix)):
             shortest_distance_node = selectedNode
 
 print(f"Shortest distance node from {vertex_list[current_node]}: {vertex_list[shortest_distance_node]}")
+
+# create a table of all shortest distances, using dijkstras algorithm
+
+verticies = [0, 1, 2, 3, 4, 5]
+dist_table = adjacency_matrix[:]
+
+for i in range(len(verticies)):
+    connections = dijkstras.dijkstras(verticies, adjacency_matrix, i)
+    for ii in range(len(connections)):
+        dist_table[i][ii] = connections[ii]
+
+print(dist_table)
