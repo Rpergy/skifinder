@@ -18,7 +18,9 @@ edges = []
 def main():
     showImg = True
 
-    floatingLine = None
+    edgeLines = []
+    currentEdge = []
+    edgeStart = None
 
     font = pygame.font.Font("freesansbold.ttf", 20)
     while True:
@@ -26,40 +28,66 @@ def main():
             if event.type == pygame.QUIT:
                 return
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    floatingLine = None
-                if event.key == pygame.K_s:
+                if event.key == pygame.K_ESCAPE: # Cancel Floating Line
+                    currentEdge = []
+                    edgeStart = None
+                if event.key == pygame.K_s: # Show/Hide Map
                     showImg = not showImg
+                if event.key == pygame.K_u: # Undo
+                    verticies.pop(-1)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     verticies.append(mousePos)
                 if event.button == 3:
-                    if floatingLine == None:
-                        for i in range(len(verticies)):
-                            distance = math.sqrt(pow(mousePos[0] - verticies[i][0], 2) + pow(mousePos[1] - verticies[i][1], 2))
-                            if distance < 10:
-                                print("selected vertex")
-                                floatingLine = i
+                    check = False
+                    for i in range(len(verticies)):
+                        distance = math.sqrt(pow(mousePos[0] - verticies[i][0], 2) + pow(mousePos[1] - verticies[i][1], 2))
+                        if distance < 10: # If clicked on vertex
+                            if len(currentEdge) == 0: # Start an edge
+                                edgeStart = i
+                                print(f"started edge at {edgeStart}")
+
+                                currentEdge.append(mousePos)
+
+                                check = True
                                 break
-                    else:
-                        for i in range(len(verticies)):
-                            distance = math.sqrt(pow(mousePos[0] - verticies[i][0], 2) + pow(mousePos[1] - verticies[i][1], 2))
-                            if distance < 10:
-                                length = math.sqrt(pow(verticies[floatingLine][0] - verticies[i][0], 2) + pow(verticies[floatingLine][1] - verticies[i][1], 2))
-                                edges.append((floatingLine, i, length))
-                                floatingLine = None
+                            else: # If floating line already exists (place edge)
+                                print(f"finished edge at {i}")
+                                currentEdge.append(mousePos)
+
+                                length = 0
+                                for j in range(len(currentEdge) - 1):
+                                    firstPoint = currentEdge[j]
+                                    secondPoint = currentEdge[j + 1]
+                                    length += math.sqrt(pow(firstPoint[0] - secondPoint[0], 2) + pow(firstPoint[1] - secondPoint[1], 2))
+
+                                edges.append((edgeStart, i, length))
+                                edgeLines += [currentEdge]
+                                #print(edgeLines)
+                                currentEdge = []
+
+                                check = True
                                 break
+                    if not len(currentEdge) == 0 and not check: 
+                            print("selected intermediate")
+                            currentEdge.append(mousePos)
 
         gameDisplay.fill((255,255,255))
         if showImg: gameDisplay.blit(img, (0,0))
 
         mousePos = pygame.mouse.get_pos()
         pygame.draw.circle(gameDisplay, (255, 0, 0), mousePos, 10)
-        
-        for i in edges:
-            pygame.draw.line(gameDisplay, (0, 0, 0), verticies[i[0]], verticies[i[1]], width=3)
 
-        for i in range(len(verticies)):
+        for i in edgeLines: # draw edges
+            for j in range(len(i) - 1):
+                pygame.draw.line(gameDisplay, (0, 0, 0), i[j], i[j + 1], 3)
+        
+        if len(currentEdge) > 0:
+            for i in range(len(currentEdge) - 1): # draw edges being made
+                pygame.draw.line(gameDisplay, (0, 0, 255), currentEdge[i], currentEdge[i + 1], 3)
+            pygame.draw.line(gameDisplay, (0, 0, 255), currentEdge[-1], mousePos, 3)
+
+        for i in range(len(verticies)): # draw verticies
             pygame.draw.circle(gameDisplay, (255, 0, 0), verticies[i], 10)
 
             text = font.render(str(i), True, (255, 255, 255))
@@ -68,14 +96,13 @@ def main():
 
             gameDisplay.blit(text, textRect)
 
-        if not floatingLine == None:
-            pygame.draw.line(gameDisplay, (0, 0, 0), verticies[floatingLine], mousePos, width=3)
-
         pygame.display.update()
         clock.tick(60)
 
 main()
 pygame.quit()
+
+print(f"Edges: {edges}")
 
 # build adjacency tables out of edges and verticies lists
 adjacency_table = [[0 for x in range(len(verticies))] for y in range(len(verticies))]
@@ -86,27 +113,3 @@ for i in edges:
 print(adjacency_table)
 
 quit()
-"""
-
-[[  0,   0,  0,  0,   0,  0, 0,  0,   0,   0,   0,  0, 303,   0,  0,  0,   0,  0, 0,  0], 
- [ 77,   0,  0,  0,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [  0,   0,  0, 94,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [  0,  69,  0,  0,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [  0,   0, 91,  0,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [  0,   0,  0,  0, 275,  0, 0,  0, 212,   0,   0,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [  0,   0,  0,  0,   0, 52, 0,  0,   0,   0,   0, 53, 137,   0,  0,  0,   0,  0, 0, 97], 
- [  0,  82,  0, 64,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [  0,   0,  0,  0,   0,  0, 0, 57,   0,   0,   0,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [164,   0,  0,  0,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [  0, 190,  0,  0,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [  0,   0,  0,  0,   0,  0, 0,  0,   0,   0, 173,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [  0,   0,  0,  0,   0,  0, 0,  0, 116,   0,   0,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [123,   0,  0,  0,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0,  0,   0,  0, 0,  0], 
- [  0,   0,  0,  0,   0,  0, 0,  0,   0,   0,   0,  0,   0, 153,  0,  0,   0,  0, 0,  0], 
- [  0,   0,  0,  0,   0,  0, 0,  0,   0, 174,   0,  0,   0,   0, 60,  0,   0,  0, 0,  0], 
- [  0,   0,  0,  0,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0, 68,   0,  0, 0,  0], 
- [  0,   0,  0,  0,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0,  0, 104,  0, 0,  0], 
- [  0,   0,  0,  0,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0,  0,   0, 74, 0,  0], 
- [  0,   0,  0,  0,   0,  0, 0,  0,   0,   0,   0,  0,   0,   0,  0, 92,   0,  0, 0,  0]]
-
-"""
