@@ -47,60 +47,57 @@ distance_table = [[0, 128, 187, 160, 217, 305, 360, 567, 450, 397, 513, 322, 385
 startingNode = 20
 targetNode = 16
 
-path = [startingNode]
+def reconstruct_path(cameFrom, current):
+    total_path = [current]
+    while current in cameFrom:
+        current = cameFrom[current]
+        total_path.insert(0, current)
+    return total_path
 
-Q = []
+def aStar(start, goal, distance_table):
+    openSet = [start]
+    cameFrom = []
 
-for i in range(len(adjacency_matrix)):
-    Q.append(i)
-
-currentNode = startingNode
-
-distanceTravelled = 0
-
-while not len(Q) == 0:
-    try:
-        Q.remove(currentNode)
-    except:
-        print("No path found")
-        break
-
-    neighbors = []
-    for i in range(len(adjacency_matrix)): # calculate all neighbors of current node
-        dst = adjacency_matrix[i][currentNode]
-        if not dst == 0:
-            neighbors.append(i)
-
-    lowestCost = 10000000000000
-
-    print(f"All neighbors: {neighbors}")
-
-    for n in neighbors: # for each neighbor node, we need to calculate the cost relative to the parent node
-        if n == targetNode: # If a neighbor is the target node, immediately move there 
-            #path.append(currentNode)
-            currentNode = n
-            break
-
-        childNeighbors = []
-        for i in range(len(adjacency_matrix)): # calculate all neighbors of child node
-            dst = adjacency_matrix[i][n]
-            if not dst == 0:
-                childNeighbors.append(i)
-
-        G = distance_table[n][startingNode] # distance from current node to starting node
-        H = distance_table[n][targetNode] # distance from current node to target node
-        F = H + G # cost
-        print(f"Cost of node {n}: {F} ({len(childNeighbors)} Neighbors)")
-        if F < lowestCost and n in Q and len(childNeighbors) != 0:
-            distanceTravelled += adjacency_matrix[n][currentNode]
-            currentNode = n
-            lowestCost = F
+    gscore = []
+    for i in distance_table:
+        gscore.append(infinity)
     
-    if currentNode == targetNode:
-        path.append(targetNode)
-        break
+    gscore[start] = 0
 
-    path.append(currentNode)
+    fscore = gscore[:]
+    fscore[start] = distance_table[start][goal] 
+
+    while not len(openSet) == 0:
+        current = 0
+        currentLowest = infinity
+
+        for i in range(len(openSet)):
+            if openSet[i] < currentLowest:
+                currentLowest = openSet[i]
+                current = i
+        
+        if current == goal:
+            return reconstruct_path(cameFrom, current)
+        
+        openSet.remove(current)
+
+        neighbors = []
+        for i in range(len(adjacency_matrix)): # calculate all neighbors of current node
+            dst = adjacency_matrix[i][current]
+            if not dst == 0:
+                neighbors.append(i)
+        
+        for n in neighbors:
+            tentativegscore = gscore[current] + adjacency_matrix[n][current]
+            if tentativegscore < gscore[n]:
+                cameFrom[n] = current
+                gscore[n] = tentativegscore
+                fscore[n] = tentativegscore + distance_table[goal][n]
+
+                if not n in openSet:
+                    openSet.add(n)
+    return "fail"
+
+path = aStar(startingNode, targetNode, distance_table)
 
 print(path)
-print(distanceTravelled)
