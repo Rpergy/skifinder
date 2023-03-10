@@ -3,20 +3,27 @@ import math
 
 pygame.init()
 
-display_width = 1501
-display_height = 757
+display_width = 852
+display_height = 721
 
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Map Editor')
 
 clock = pygame.time.Clock()
-img = pygame.image.load('Resources/map.png')
 
 verticies = []
 edges = []
 
 def main():
+    display_width = 852
+    display_height = 721
+
+    display_scale = 1.0
+
     showImg = True
+
+    img = pygame.image.load('Resources/googleEarthTest.png')
+    originalImg = pygame.image.load('Resources/googleEarthTest.png')
 
     edgeLines = []
     currentEdge = []
@@ -33,15 +40,30 @@ def main():
                     edgeStart = None
                 if event.key == pygame.K_s: # Show/Hide Map
                     showImg = not showImg
+                
+                if event.key == pygame.K_q: # zoom in
+                    display_scale += 0.05
+                    img = pygame.transform.smoothscale(originalImg, (display_width * display_scale, display_height * display_scale))
+                if event.key == pygame.K_e: # zoom out
+                    display_scale -= 0.05
+                    img = pygame.transform.smoothscale(originalImg, (display_width * display_scale, display_height * display_scale))
+                
                 if event.key == pygame.K_u: # Undo
                     verticies.pop(-1)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    verticies.append(mousePos)
+                    verticies.append((mousePos[0]/display_scale, mousePos[1]/display_scale))
+                    print(f"Added vertex at: {(mousePos[0]/display_scale, mousePos[1]/display_scale)}")
                 if event.button == 3:
                     check = False
                     for i in range(len(verticies)):
-                        distance = math.sqrt(pow(mousePos[0] - verticies[i][0], 2) + pow(mousePos[1] - verticies[i][1], 2))
+                        scaledMousePos = (mousePos[0]*display_scale, mousePos[1]*display_scale)
+                        scaledVerticies = (verticies[i][0]*display_scale, verticies[i][1]*display_scale)
+ 
+                        distance = math.sqrt(pow(scaledMousePos[0] - scaledVerticies[0], 2) + pow(scaledMousePos[1] - scaledVerticies[1], 2))
+
+                        print(distance)
+
                         if distance < 10: # If clicked on vertex
                             if len(currentEdge) == 0: # Start an edge
                                 edgeStart = i
@@ -80,19 +102,30 @@ def main():
 
         for i in edgeLines: # draw edges
             for j in range(len(i) - 1):
-                pygame.draw.line(gameDisplay, (0, 0, 0), i[j], i[j + 1], 3)
+                scaledPos1 = (i[j][0]*display_scale, i[j][1]*display_scale)
+                scaledPos2 = (i[j + 1][0]*display_scale, i[j + 1][1]*display_scale)
+
+                pygame.draw.line(gameDisplay, (0, 0, 0), scaledPos1, scaledPos2, 3)
         
-        if len(currentEdge) > 0:
-            for i in range(len(currentEdge) - 1): # draw edges being made
-                pygame.draw.line(gameDisplay, (0, 0, 255), currentEdge[i], currentEdge[i + 1], 3)
-            pygame.draw.line(gameDisplay, (0, 0, 255), currentEdge[-1], mousePos, 3)
+        if len(currentEdge) > 0: # draw edges being currently made
+            for i in range(len(currentEdge) - 1): 
+                scaledPos1 = (currentEdge[i][0]*display_scale, currentEdge[i][1]*display_scale)
+                scaledPos2 = (currentEdge[i + 1][0]*display_scale, currentEdge[i + 1][1]*display_scale)
+
+                pygame.draw.line(gameDisplay, (0, 0, 255), scaledPos1, scaledPos2, 3)
+            
+            scaledPos = (currentEdge[-1][0]*display_scale, currentEdge[-1][1]*display_scale)
+            scaledMousePos = (mousePos[0]*display_scale, mousePos[1]*display_scale)
+
+            pygame.draw.line(gameDisplay, (0, 0, 255), scaledPos, scaledMousePos, 3)
 
         for i in range(len(verticies)): # draw verticies
-            pygame.draw.circle(gameDisplay, (255, 0, 0), verticies[i], 10)
+            scaledPos = (verticies[i][0]*display_scale, verticies[i][1]*display_scale)
+            pygame.draw.circle(gameDisplay, (255, 0, 0), scaledPos, 10)
 
             text = font.render(str(i), True, (255, 255, 255))
             textRect = text.get_rect()
-            textRect.center = verticies[i]
+            textRect.center = scaledPos
 
             gameDisplay.blit(text, textRect)
 

@@ -16,7 +16,7 @@ distance_table = [[ 0, 10, 12, 14,  5,  5],
 
 infinity = 9223372036854775807
 
-startingNode = 0
+startingNode = 33
 target = 41
 
 adjacency_matrix = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 177, 0, 0, 0, 0], [128, 0, 0, 227, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], [187, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -48,12 +48,12 @@ while not len(verticies) == 0:
             minDist = dist[i]
             u = i
     
-    if u == target:
-        S = []
+    if u == target: # if found target, work backwards to reconstruct path
+        path = []
         u = target
         if not prev[u] == None or u == startingNode:
             while not u == None:
-                S.insert(0, u)
+                path.insert(0, u)
                 u = prev[u]
         break
 
@@ -72,4 +72,4 @@ while not len(verticies) == 0:
                 dist[n] = alt
                 prev[n] = u
 
-print(S)
+print(path)
