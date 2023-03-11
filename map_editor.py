@@ -60,7 +60,7 @@ def main():
                     verticies.pop(-1)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1: # place vertex
-                    vertexPos = ((mousePos[0] - xOffset) / display_scale, (mousePos[1] - yOffset) / display_scale)
+                    vertexPos = (round((mousePos[0] - xOffset) / display_scale, 1), round((mousePos[1] - yOffset) / display_scale), 1)
                     verticies.append(vertexPos)
                     print(f"Added vertex at: {vertexPos}")
                 if event.button == 3: 
@@ -89,7 +89,7 @@ def main():
                                 edges.append((edgeStart, i, length))
                                 edgeLines += [currentEdge]
 
-                                drawnEdges.append([currentEdge, edgeStart, i])
+                                drawnEdges.append([round(currentEdge, 1), round(edgeStart, 1), i])
                                 currentEdge = []
 
                                 check = True
