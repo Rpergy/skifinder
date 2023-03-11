@@ -14,6 +14,8 @@ clock = pygame.time.Clock()
 verticies = []
 edges = []
 
+drawnEdges = []
+
 def main():
     display_width = 852
     display_height = 721
@@ -83,6 +85,8 @@ def main():
 
                                 edges.append((edgeStart, i, length))
                                 edgeLines += [currentEdge]
+
+                                drawnEdges.append([currentEdge, edgeStart, i])
                                 currentEdge = []
 
                                 check = True
@@ -110,7 +114,7 @@ def main():
             for j in range(len(i) - 1):
                 startPoint = (i[j][0] * display_scale + xOffset, i[j][1] * display_scale + yOffset)
                 endPoint = (i[j + 1][0] * display_scale + xOffset, i[j + 1][1] * display_scale + yOffset)
-                pygame.draw.line(gameDisplay, (0, 0, 0), startPoint, endPoint, 3)  
+                pygame.draw.line(gameDisplay, (0, 0, 0), startPoint, endPoint, 3)
         if len(currentEdge) > 0: # draw edges being currently made
             for i in range(len(currentEdge) - 1): # draw each line that makes up an edge
                 startPoint = (currentEdge[i][0] * display_scale + xOffset, currentEdge[i][1] * display_scale + yOffset)
@@ -147,7 +151,7 @@ def main():
 main()
 pygame.quit()
 
-print(f"Edges: {edges}")
+print(f"Edges: {drawnEdges}")
 
 # build adjacency tables out of edges and verticies lists
 adjacency_table = [[0 for x in range(len(verticies))] for y in range(len(verticies))]
@@ -155,6 +159,7 @@ adjacency_table = [[0 for x in range(len(verticies))] for y in range(len(vertici
 for i in edges:
     adjacency_table[i[1]][i[0]] = int(i[2])
 
-print(adjacency_table)
+print("Adjacency Table:", adjacency_table)
+print("Vertex Pos:", verticies)
 
 quit()
