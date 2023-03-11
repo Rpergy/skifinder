@@ -66,7 +66,7 @@ def main():
                 if event.button == 3: 
                     check = False
                     for i in range(len(verticies)):
-                        clickPos = ((mousePos[0] - xOffset) / display_scale, (mousePos[1] - yOffset) / display_scale)
+                        clickPos = (round((mousePos[0] - xOffset) / display_scale, 1), round((mousePos[1] - yOffset) / display_scale, 1))
                         distance = math.sqrt(pow(clickPos[0] - verticies[i][0], 2) + pow(clickPos[1] - verticies[i][1], 2))
 
                         if distance < 10: # If clicked on vertex
@@ -89,7 +89,7 @@ def main():
                                 edges.append((edgeStart, i, length))
                                 edgeLines += [currentEdge]
 
-                                drawnEdges.append([round(currentEdge, 1), round(edgeStart, 1), i])
+                                drawnEdges.append([currentEdge, edgeStart, i])
                                 currentEdge = []
 
                                 check = True
