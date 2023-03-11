@@ -26,6 +26,7 @@ def main():
     yOffset = 0
 
     showImg = True
+    pause = False
 
     img = pygame.image.load('Resources/googleEarthTest.png')
     originalImg = pygame.image.load('Resources/googleEarthTest.png')
@@ -43,8 +44,10 @@ def main():
                 if event.key == pygame.K_ESCAPE: # Cancel Floating Line
                     currentEdge = []
                     edgeStart = None
-                if event.key == pygame.K_p: # Show/Hide Map
+                if event.key == pygame.K_m: # Show/Hide Map
                     showImg = not showImg
+                if event.key == pygame.K_p:
+                    pause = not pause
                 
                 if event.key == pygame.K_q: # zoom in
                     display_scale += 0.05
@@ -101,13 +104,14 @@ def main():
         mousePos = pygame.mouse.get_pos()
         pygame.draw.circle(gameDisplay, (255, 0, 0), mousePos, 10)
 
-        if mousePos[0] < display_width/10:
+        if not pause:
+            if mousePos[0] < display_width/10:
                 xOffset += 4
-        if mousePos[0] > display_width * 9/10:
+            if mousePos[0] > display_width * 9/10:
                 xOffset -= 4
-        if mousePos[1] < display_height/10:
+            if mousePos[1] < display_height/10:
                 yOffset += 4
-        if mousePos[1] > display_height * 9/10:
+            if mousePos[1] > display_height * 9/10:
                 yOffset -= 4
 
         for i in edgeLines: # draw edges
