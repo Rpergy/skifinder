@@ -20,6 +20,9 @@ def main():
 
     display_scale = 1.0
 
+    xOffset = 0
+    yOffset = 0
+
     showImg = True
 
     img = pygame.image.load('Resources/googleEarthTest.png')
@@ -38,7 +41,7 @@ def main():
                 if event.key == pygame.K_ESCAPE: # Cancel Floating Line
                     currentEdge = []
                     edgeStart = None
-                if event.key == pygame.K_s: # Show/Hide Map
+                if event.key == pygame.K_p: # Show/Hide Map
                     showImg = not showImg
                 
                 if event.key == pygame.K_q: # zoom in
@@ -47,35 +50,30 @@ def main():
                 if event.key == pygame.K_e: # zoom out
                     display_scale -= 0.05
                     img = pygame.transform.smoothscale(originalImg, (display_width * display_scale, display_height * display_scale))
-                
+
                 if event.key == pygame.K_u: # Undo
                     verticies.pop(-1)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    verticies.append((mousePos[0]/display_scale, mousePos[1]/display_scale))
-                    print(f"Added vertex at: {(mousePos[0]/display_scale, mousePos[1]/display_scale)}")
-                if event.button == 3:
+                if event.button == 1: # place vertex
+                    vertexPos = ((mousePos[0] - xOffset) / display_scale, (mousePos[1] - yOffset) / display_scale)
+                    verticies.append(vertexPos)
+                    print(f"Added vertex at: {vertexPos}")
+                if event.button == 3: 
                     check = False
                     for i in range(len(verticies)):
-                        scaledMousePos = (mousePos[0]*display_scale, mousePos[1]*display_scale)
-                        scaledVerticies = (verticies[i][0]*display_scale, verticies[i][1]*display_scale)
- 
-                        distance = math.sqrt(pow(scaledMousePos[0] - scaledVerticies[0], 2) + pow(scaledMousePos[1] - scaledVerticies[1], 2))
-
-                        print(distance)
+                        clickPos = ((mousePos[0] - xOffset) / display_scale, (mousePos[1] - yOffset) / display_scale)
+                        distance = math.sqrt(pow(clickPos[0] - verticies[i][0], 2) + pow(clickPos[1] - verticies[i][1], 2))
 
                         if distance < 10: # If clicked on vertex
-                            if len(currentEdge) == 0: # Start an edge
+                            if len(currentEdge) == 0: # Start edge
                                 edgeStart = i
                                 print(f"started edge at {edgeStart}")
-
-                                currentEdge.append(mousePos)
-
+                                currentEdge.append(clickPos)
                                 check = True
                                 break
-                            else: # If floating line already exists (place edge)
+                            else: # Finish edge
                                 print(f"finished edge at {i}")
-                                currentEdge.append(mousePos)
+                                currentEdge.append(clickPos)
 
                                 length = 0
                                 for j in range(len(currentEdge) - 1):
@@ -85,49 +83,63 @@ def main():
 
                                 edges.append((edgeStart, i, length))
                                 edgeLines += [currentEdge]
-                                #print(edgeLines)
                                 currentEdge = []
 
                                 check = True
                                 break
-                    if not len(currentEdge) == 0 and not check: 
+                    if not len(currentEdge) == 0 and not check: # Place pivot on edge
                             print("selected intermediate")
-                            currentEdge.append(mousePos)
+                            currentEdge.append(clickPos)
 
-        gameDisplay.fill((255,255,255))
-        if showImg: gameDisplay.blit(img, (0,0))
+        gameDisplay.fill((44,64,49))
+        if showImg: gameDisplay.blit(img, (xOffset,yOffset))
 
         mousePos = pygame.mouse.get_pos()
         pygame.draw.circle(gameDisplay, (255, 0, 0), mousePos, 10)
 
+        if mousePos[0] < display_width/10:
+                xOffset += 4
+        if mousePos[0] > display_width * 9/10:
+                xOffset -= 4
+        if mousePos[1] < display_height/10:
+                yOffset += 4
+        if mousePos[1] > display_height * 9/10:
+                yOffset -= 4
+
         for i in edgeLines: # draw edges
             for j in range(len(i) - 1):
-                scaledPos1 = (i[j][0]*display_scale, i[j][1]*display_scale)
-                scaledPos2 = (i[j + 1][0]*display_scale, i[j + 1][1]*display_scale)
-
-                pygame.draw.line(gameDisplay, (0, 0, 0), scaledPos1, scaledPos2, 3)
-        
+                startPoint = (i[j][0] * display_scale + xOffset, i[j][1] * display_scale + yOffset)
+                endPoint = (i[j + 1][0] * display_scale + xOffset, i[j + 1][1] * display_scale + yOffset)
+                pygame.draw.line(gameDisplay, (0, 0, 0), startPoint, endPoint, 3)  
         if len(currentEdge) > 0: # draw edges being currently made
-            for i in range(len(currentEdge) - 1): 
-                scaledPos1 = (currentEdge[i][0]*display_scale, currentEdge[i][1]*display_scale)
-                scaledPos2 = (currentEdge[i + 1][0]*display_scale, currentEdge[i + 1][1]*display_scale)
-
-                pygame.draw.line(gameDisplay, (0, 0, 255), scaledPos1, scaledPos2, 3)
+            for i in range(len(currentEdge) - 1): # draw each line that makes up an edge
+                startPoint = (currentEdge[i][0] * display_scale + xOffset, currentEdge[i][1] * display_scale + yOffset)
+                endPoint = (currentEdge[i + 1][0] * display_scale + xOffset, currentEdge[i + 1][1] * display_scale + yOffset)
+                pygame.draw.line(gameDisplay, (0, 0, 255), startPoint, endPoint, 3)
             
-            scaledPos = (currentEdge[-1][0]*display_scale, currentEdge[-1][1]*display_scale)
-            scaledMousePos = (mousePos[0]*display_scale, mousePos[1]*display_scale)
-
-            pygame.draw.line(gameDisplay, (0, 0, 255), scaledPos, scaledMousePos, 3)
-
+            startPoint = (currentEdge[-1][0] * display_scale + xOffset, currentEdge[-1][1] * display_scale + yOffset)
+            pygame.draw.line(gameDisplay, (0, 0, 255), startPoint, mousePos, 3) # draw a line that represents next edge
         for i in range(len(verticies)): # draw verticies
-            scaledPos = (verticies[i][0]*display_scale, verticies[i][1]*display_scale)
-            pygame.draw.circle(gameDisplay, (255, 0, 0), scaledPos, 10)
+            drawPos = (verticies[i][0] * display_scale + xOffset, verticies[i][1]*display_scale + yOffset)
+            pygame.draw.circle(gameDisplay, (255, 0, 0), drawPos, 10)
 
             text = font.render(str(i), True, (255, 255, 255))
             textRect = text.get_rect()
-            textRect.center = scaledPos
+            textRect.center = drawPos
 
             gameDisplay.blit(text, textRect)
+
+        zoomText = font.render("Zoom: " + str(round(display_scale, 2)), True, (255, 255, 255))
+        zoomTextRect = zoomText.get_rect()
+        zoomTextRect.center = (60, 20)
+
+        clickPos = (round((mousePos[0] - xOffset) / display_scale), round((mousePos[1] - yOffset) / display_scale))
+        mouseText = font.render(str(clickPos), True, (255, 255, 255))
+        mouseTextRect = mouseText.get_rect()
+        mouseTextRect.center = (60, 50)
+
+        gameDisplay.blit(zoomText, zoomTextRect)
+        gameDisplay.blit(mouseText, mouseTextRect)
 
         pygame.display.update()
         clock.tick(60)
