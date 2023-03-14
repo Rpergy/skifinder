@@ -40,18 +40,25 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+            if event.type == pygame.MOUSEWHEEL:
+                if event.y == -1: # Zoom in
+                    display_scale -= 0.05
+                    img = pygame.transform.smoothscale(originalImg, (display_width * display_scale, display_height * display_scale))
+                elif event.y == 1: # Zoom out
+                    display_scale += 0.05
+                    img = pygame.transform.smoothscale(originalImg, (display_width * display_scale, display_height * display_scale))
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE: # Cancel Floating Line
                     currentEdge = []
                     edgeStart = None
                 if event.key == pygame.K_m: # Show/Hide Map
                     showImg = not showImg
-                if event.key == pygame.K_p:
+                if event.key == pygame.K_p: # Pause
                     pause = not pause
-                if event.key == pygame.K_l:
+                if event.key == pygame.K_l: # Undo edge
                     drawnEdges.pop()
                     edgeLines.pop()
-                if event.key == pygame.K_j:
+                if event.key == pygame.K_j: # place edge (keyboard)
                     check = False
                     for i in range(len(verticies)):
                         clickPos = (round((mousePos[0] - xOffset) / display_scale, 1), round((mousePos[1] - yOffset) / display_scale, 1))
@@ -85,20 +92,19 @@ def main():
                     if not len(currentEdge) == 0 and not check: # Place pivot on edge
                             print("selected intermediate")
                             currentEdge.append(clickPos)
-
                 
-                if event.key == pygame.K_q: # zoom in
+                if event.key == pygame.K_q: # zoom in (keyboard)
                     display_scale += 0.05
                     img = pygame.transform.smoothscale(originalImg, (display_width * display_scale, display_height * display_scale))
-                if event.key == pygame.K_e: # zoom out
+                if event.key == pygame.K_e: # zoom out (keyboard)
                     display_scale -= 0.05
                     img = pygame.transform.smoothscale(originalImg, (display_width * display_scale, display_height * display_scale))
 
-                if event.key == pygame.K_u: # Undo
+                if event.key == pygame.K_u: # Undo vertex
                     verticies.pop(-1)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1: # place vertex
-                    vertexPos = (round((mousePos[0] - xOffset) / display_scale, 1), round((mousePos[1] - yOffset) / display_scale), 1)
+                    vertexPos = (round((mousePos[0] - xOffset) / display_scale, 1), round((mousePos[1] - yOffset) / display_scale, 1))
                     verticies.append(vertexPos)
                     print(f"Added vertex at: {vertexPos}")
                 if event.button == 3: 
