@@ -28,8 +28,8 @@ def main():
     showImg = True
     pause = False
 
-    img = pygame.image.load('Resources/googleEarthTest.png')
-    originalImg = pygame.image.load('Resources/googleEarthTest.png')
+    img = pygame.image.load('Resources/loon.png')
+    originalImg = pygame.image.load('Resources/loon.png')
 
     edgeLines = []
     currentEdge = []
@@ -48,6 +48,44 @@ def main():
                     showImg = not showImg
                 if event.key == pygame.K_p:
                     pause = not pause
+                if event.key == pygame.K_l:
+                    drawnEdges.pop()
+                    edgeLines.pop()
+                if event.key == pygame.K_j:
+                    check = False
+                    for i in range(len(verticies)):
+                        clickPos = (round((mousePos[0] - xOffset) / display_scale, 1), round((mousePos[1] - yOffset) / display_scale, 1))
+                        distance = math.sqrt(pow(clickPos[0] - verticies[i][0], 2) + pow(clickPos[1] - verticies[i][1], 2))
+
+                        if distance < 10: # If clicked on vertex
+                            if len(currentEdge) == 0: # Start edge
+                                edgeStart = i
+                                print(f"started edge at {edgeStart}")
+                                currentEdge.append(clickPos)
+                                check = True
+                                break
+                            else: # Finish edge
+                                print(f"finished edge at {i}")
+                                currentEdge.append(clickPos)
+
+                                length = 0
+                                for j in range(len(currentEdge) - 1):
+                                    firstPoint = currentEdge[j]
+                                    secondPoint = currentEdge[j + 1]
+                                    length += math.sqrt(pow(firstPoint[0] - secondPoint[0], 2) + pow(firstPoint[1] - secondPoint[1], 2))
+
+                                edges.append((edgeStart, i, length))
+                                edgeLines += [currentEdge]
+
+                                drawnEdges.append([currentEdge, edgeStart, i])
+                                currentEdge = []
+
+                                check = True
+                                break
+                    if not len(currentEdge) == 0 and not check: # Place pivot on edge
+                            print("selected intermediate")
+                            currentEdge.append(clickPos)
+
                 
                 if event.key == pygame.K_q: # zoom in
                     display_scale += 0.05
