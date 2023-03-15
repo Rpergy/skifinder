@@ -1,5 +1,6 @@
 import pygame
 import math
+import json
 
 pygame.init()
 
@@ -199,15 +200,19 @@ def main():
 main()
 pygame.quit()
 
-print(f"Edges: {drawnEdges}")
-
 # build adjacency tables out of edges and verticies lists
 adjacency_table = [[0 for x in range(len(verticies))] for y in range(len(verticies))]
 
 for i in edges:
     adjacency_table[i[1]][i[0]] = int(i[2])
 
-print("Adjacency Table:", adjacency_table)
-print("Vertex Pos:", verticies)
+verticies = json.dumps(verticies)
+drawnEdges = json.dumps(drawnEdges)
+
+data = '{"Wachusett": {\n    "verticies": ' + str(verticies) + ',\n   "edges": ' + str(drawnEdges) + ',\n    "adjacency_table": ' + str(adjacency_table) + '\n}\n}'
+
+file = open("test.json", "w")
+
+file.write(data)
 
 quit()
