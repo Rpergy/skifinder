@@ -4,7 +4,7 @@
   <br><br>
   Eventually, I'd like to turn this project into a full-fledged app that someone could use for themselves while skiing.
 <br><br>
-# futute features
+# future features
   I have decided to put this project on hold for now to start working on my long list of other projects, but I have ideas for a variety of different features that could possibly be implemented in the future. <br>Here are some of them:
   - Generate paths bised around different parameters (avoid all lifts, avoid certain trail difficulties)
   - Access an API that will remove certain lifts and trails from the map depending on if they are open or closed for the day
