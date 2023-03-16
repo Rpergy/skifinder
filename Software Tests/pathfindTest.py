@@ -4,8 +4,8 @@ import json
 
 pygame.init()
 
-display_width = 852
-display_height = 721
+display_width = 568
+display_height = 635
 infinity = 9223372036854775807
 
 def dijkstras(start, end, adjacency_matrix):
@@ -59,16 +59,17 @@ pygame.display.set_caption('Map Editor')
 clock = pygame.time.Clock()
 
 def main():
-    img = pygame.image.load('Resources/loon.png')
+    img = pygame.image.load('Maps/wachusett.png')
 
     data = json.loads(open("mountains.json", "r").read())
-    adjacency_table = data["Loon"]["adjacency_table"]
-    verticies = data["Loon"]["verticies"]
-    edges = data["Loon"]["edges"]
+    adjacency_table = data["Wachusett"]["adjacency_table"]
+    verticies = data["Wachusett"]["verticies"]
+    edges = data["Wachusett"]["edges"]
     
     path = []
 
-    important_verticies = [0, 7, 18, 26, 28, 35, 36, 37, 38, 70, 80, 81]
+    #important_verticies = [0, 7, 18, 26, 28, 35, 36, 37, 38, 70, 80, 81] loon
+    important_verticies = [0, 1, 2, 3, 4, 5, 6, 7, 37]
 
     font = pygame.font.Font("freesansbold.ttf", 20)
 
@@ -123,11 +124,10 @@ def main():
                     pygame.draw.circle(gameDisplay, (0, 255, 0), verticies[i], 10)
                 else:
                     pygame.draw.circle(gameDisplay, (255, 0, 0), verticies[i], 10)
-
-                #text = font.render(str(i), True, (255, 255, 255))
-                #textRect = text.get_rect()
-                #textRect.center = verticies[i]
-                #gameDisplay.blit(text, textRect)
+            #text = font.render(str(i), True, (255, 255, 255))
+            #textRect = text.get_rect()
+            #textRect.center = verticies[i]
+            #gameDisplay.blit(text, textRect)
 
         pygame.display.update()
         clock.tick(60)

@@ -4,8 +4,8 @@ import json
 
 pygame.init()
 
-display_width = 852
-display_height = 721
+display_width = 568
+display_height = 635
 
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 pygame.display.set_caption('Map Editor')
@@ -18,8 +18,8 @@ edges = []
 drawnEdges = []
 
 def main():
-    display_width = 852
-    display_height = 721
+    display_width = 568
+    display_height = 635
 
     display_scale = 1.0
 
@@ -29,8 +29,8 @@ def main():
     showImg = True
     pause = False
 
-    img = pygame.image.load('Resources/loon.png')
-    originalImg = pygame.image.load('Resources/loon.png')
+    img = pygame.image.load('Maps/wachusett.png')
+    originalImg = pygame.image.load('Maps/wachusett.png')
 
     edgeLines = []
     currentEdge = []
