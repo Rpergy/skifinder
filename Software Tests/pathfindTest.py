@@ -59,28 +59,36 @@ pygame.display.set_caption('Map Editor')
 clock = pygame.time.Clock()
 
 def main():
-    img = pygame.image.load('Maps/wachusett.png')
+    img = pygame.image.load('Maps/Wachusett.png')
 
     data = json.loads(open("mountains.json", "r").read())
     adjacency_table = data["Wachusett"]["adjacency_table"]
     verticies = data["Wachusett"]["verticies"]
     edges = data["Wachusett"]["edges"]
-    
-    path = []
+    important_verticies = data["Wachusett"]["important_verticies"]
 
-    #important_verticies = [0, 7, 18, 26, 28, 35, 36, 37, 38, 70, 80, 81] loon
-    important_verticies = [0, 1, 2, 3, 4, 5, 6, 7, 37]
+    path = []
 
     font = pygame.font.Font("freesansbold.ttf", 20)
 
     startVertex = -1
     endVertex = -1
 
+    debugLines = False
+    debugText = False
+    debugVerticies = False
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e:
+                    debugLines = not debugLines
+                if event.key == pygame.K_t:
+                    debugText = not debugText
+                if event.key == pygame.K_v:
+                    debugVerticies = not debugVerticies
                 if event.key == pygame.K_ESCAPE:
                     startVertex = -1
                     endVertex = -1
@@ -90,7 +98,7 @@ def main():
                     mousePos = pygame.mouse.get_pos()
                     for i in range(len(verticies)):
                         distance = math.sqrt(pow(verticies[i][0] - mousePos[0], 2) + pow(verticies[i][1] - mousePos[1], 2))
-                        if distance < 10 and i in important_verticies:
+                        if distance < 10 and (i in important_verticies or debugVerticies):
                             if startVertex == -1:
                                 startVertex = i
                             else:
@@ -107,8 +115,9 @@ def main():
             startPoint = i[1]
             endPoint = i[2]
 
-            #for j in range(len(i[0]) - 1):
-            #    pygame.draw.line(gameDisplay, (0, 0, 0), i[0][j], i[0][j + 1], 3)
+            if debugLines:
+                for j in range(len(i[0]) - 1):
+                    pygame.draw.line(gameDisplay, (0, 0, 0), i[0][j], i[0][j + 1], 3)
 
             for ii in range(len(path) - 1):
                 start = path[ii]
@@ -119,15 +128,16 @@ def main():
                         pygame.draw.line(gameDisplay, (0, 255, 0), i[0][j], i[0][j + 1], 3)
 
         for i in range(len(verticies)): # draw verticies
-            if i in important_verticies:
+            if i in important_verticies or debugVerticies:
                 if i == startVertex or i == endVertex:
                     pygame.draw.circle(gameDisplay, (0, 255, 0), verticies[i], 10)
                 else:
                     pygame.draw.circle(gameDisplay, (255, 0, 0), verticies[i], 10)
-            #text = font.render(str(i), True, (255, 255, 255))
-            #textRect = text.get_rect()
-            #textRect.center = verticies[i]
-            #gameDisplay.blit(text, textRect)
+                if debugText:
+                    text = font.render(str(i), True, (255, 255, 255))
+                    textRect = text.get_rect()
+                    textRect.center = verticies[i]
+                    gameDisplay.blit(text, textRect)
 
         pygame.display.update()
         clock.tick(60)
