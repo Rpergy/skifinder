@@ -59,13 +59,13 @@ pygame.display.set_caption('Map Editor')
 clock = pygame.time.Clock()
 
 def main():
-    img = pygame.image.load('Maps/Wachusett.png')
+    img = pygame.image.load('Maps/Loon.png')
 
     data = json.loads(open("mountains.json", "r").read())
-    adjacency_table = data["Wachusett"]["adjacency_table"]
-    verticies = data["Wachusett"]["verticies"]
-    edges = data["Wachusett"]["edges"]
-    important_verticies = data["Wachusett"]["important_verticies"]
+    adjacency_table = data["Loon"]["adjacency_table"]
+    verticies = data["Loon"]["verticies"]
+    edges = data["Loon"]["edges"]
+    important_verticies = data["Loon"]["important_verticies"]
 
     path = []
 
